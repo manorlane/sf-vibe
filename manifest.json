@@ -1,0 +1,18 @@
+{
+  "short_name": "SF Vibe",
+  "name": "SF Vibe: San Francisco Events & Dining",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2554/2554922.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#FBFBFE",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait"
+}
