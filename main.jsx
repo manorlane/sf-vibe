@@ -22,16 +22,44 @@ const NAV_TABS = [
 const EVENT_CATEGORIES = ["All", "Music", "Comedy", "Art", "Food", "Festival", "Outdoors", "Sports", "Theater", "Family"];
 
 const INITIAL_EVENTS = [
-  { id: 1, title: "Golden Gate Park Bandshell", date: "2026-03-08", category: "Music", cost: "Free", location: "Golden Gate Park", rating: 4.8, link: "https://sf.funcheap.com" },
-  { id: 2, title: "SF Giants Spring Preview", date: "2026-03-15", category: "Sports", cost: "$$", location: "Oracle Park", rating: 4.7, link: "https://sfgiants.com" },
-  { id: 3, title: "Outside Lands Early Bird", date: "2026-03-20", category: "Festival", cost: "$$$", location: "Golden Gate Park", rating: 4.9, link: "https://sfoutsidelands.com" },
-  { id: 4, title: "Cobb's Comedy Showcase", date: "2026-03-04", category: "Comedy", cost: "$$", location: "North Beach", rating: 4.5, link: "https://cobbscomedy.com" },
-  { id: 5, title: "Chinese New Year Parade", date: "2026-03-07", category: "Art", cost: "Free", location: "Chinatown", rating: 4.9, link: "https://chineseparade.com" },
-  { id: 6, title: "Ferry Building Farmers Market", date: "2026-03-07", category: "Food", cost: "Free", location: "Embarcadero", rating: 4.8, link: "https://ferrybuildingmarketplace.com" },
-  { id: 7, title: "SF Sketchfest Comedy", date: "2026-03-12", category: "Comedy", cost: "$$", location: "Castro Theatre", rating: 4.6, link: "https://sfsketchfest.com" },
-  { id: 8, title: "Lands End Trail Cleanup", date: "2026-03-14", category: "Outdoors", cost: "Free", location: "Lands End", rating: 4.5, link: "https://parksconservancy.org" },
-  { id: 9, title: "SFMOMA After Dark", date: "2026-03-19", category: "Art", cost: "$$", location: "SOMA", rating: 4.7, link: "https://sfmoma.org" },
-  { id: 10, title: "Beach Blanket Babylon", date: "2026-03-21", category: "Theater", cost: "$$$", location: "North Beach", rating: 4.8, link: "https://beachblanketbabylon.com" },
+  // Week 1
+  { id: 1, title: "Golden Gate Park Bandshell Concert", date: "2026-03-01", category: "Music", cost: "Free", location: "Golden Gate Park", rating: 4.8, link: "https://sf.funcheap.com" },
+  { id: 2, title: "Ferry Building Farmers Market", date: "2026-03-01", category: "Food", cost: "Free", location: "Embarcadero", rating: 4.8, link: "https://ferrybuildingmarketplace.com" },
+  { id: 3, title: "Cobb's Comedy Showcase", date: "2026-03-04", category: "Comedy", cost: "$$", location: "North Beach", rating: 4.5, link: "https://cobbscomedy.com" },
+  { id: 4, title: "SFMOMA Free First Tuesday", date: "2026-03-03", category: "Art", cost: "Free", location: "SOMA", rating: 4.7, link: "https://sfmoma.org" },
+  { id: 5, title: "Lands End Sunset Hike", date: "2026-03-05", category: "Outdoors", cost: "Free", location: "Lands End", rating: 4.6, link: "https://parksconservancy.org" },
+  { id: 6, title: "Fillmore Jazz Festival Kick-off", date: "2026-03-06", category: "Music", cost: "$", location: "Fillmore", rating: 4.7, link: "https://thefillmore.com" },
+  { id: 7, title: "Chinese New Year Parade", date: "2026-03-07", category: "Festival", cost: "Free", location: "Chinatown", rating: 4.9, link: "https://chineseparade.com" },
+  { id: 8, title: "Ferry Building Farmers Market", date: "2026-03-08", category: "Food", cost: "Free", location: "Embarcadero", rating: 4.8, link: "https://ferrybuildingmarketplace.com" },
+  // Week 2
+  { id: 9, title: "SF Sketchfest Comedy Night", date: "2026-03-10", category: "Comedy", cost: "$$", location: "Castro Theatre", rating: 4.6, link: "https://sfsketchfest.com" },
+  { id: 10, title: "Giants Spring Training Watch Party", date: "2026-03-11", category: "Sports", cost: "$", location: "Oracle Park", rating: 4.5, link: "https://sfgiants.com" },
+  { id: 11, title: "Mission District Mural Walk", date: "2026-03-11", category: "Art", cost: "Free", location: "Mission", rating: 4.6, link: "https://precitaeyes.org" },
+  { id: 12, title: "Beach Blanket Babylon", date: "2026-03-12", category: "Theater", cost: "$$$", location: "North Beach", rating: 4.8, link: "https://beachblanketbabylon.com" },
+  { id: 13, title: "Presidio Tunnel Tops Family Day", date: "2026-03-13", category: "Family", cost: "Free", location: "Presidio", rating: 4.7, link: "https://presidio.gov" },
+  { id: 14, title: "Lands End Trail Cleanup", date: "2026-03-14", category: "Outdoors", cost: "Free", location: "Lands End", rating: 4.5, link: "https://parksconservancy.org" },
+  { id: 15, title: "Ferry Building Farmers Market", date: "2026-03-15", category: "Food", cost: "Free", location: "Embarcadero", rating: 4.8, link: "https://ferrybuildingmarketplace.com" },
+  { id: 16, title: "Independent Music Showcase", date: "2026-03-13", category: "Music", cost: "$$", location: "Divisadero", rating: 4.6, link: "https://theindependentsf.com" },
+  // Week 3
+  { id: 17, title: "St. Patrick's Day Parade", date: "2026-03-17", category: "Festival", cost: "Free", location: "Civic Center", rating: 4.7, link: "https://uiasf.org" },
+  { id: 18, title: "SF Opera Free Simulcast", date: "2026-03-17", category: "Theater", cost: "Free", location: "Civic Center Plaza", rating: 4.8, link: "https://sfopera.com" },
+  { id: 19, title: "SFMOMA After Dark", date: "2026-03-19", category: "Art", cost: "$$", location: "SOMA", rating: 4.7, link: "https://sfmoma.org" },
+  { id: 20, title: "Outside Lands Preview Show", date: "2026-03-20", category: "Music", cost: "$$$", location: "Golden Gate Park", rating: 4.9, link: "https://sfoutsidelands.com" },
+  { id: 21, title: "Bernal Hill Kite Festival", date: "2026-03-21", category: "Family", cost: "Free", location: "Bernal Heights", rating: 4.6, link: "https://sf.funcheap.com" },
+  { id: 22, title: "Ferry Building Farmers Market", date: "2026-03-22", category: "Food", cost: "Free", location: "Embarcadero", rating: 4.8, link: "https://ferrybuildingmarketplace.com" },
+  { id: 23, title: "Cobb's Comedy Late Show", date: "2026-03-21", category: "Comedy", cost: "$$", location: "North Beach", rating: 4.5, link: "https://cobbscomedy.com" },
+  { id: 24, title: "Bay to Breakers Training Run", date: "2026-03-22", category: "Sports", cost: "Free", location: "Panhandle", rating: 4.4, link: "https://baytobreakers.com" },
+  // Week 4
+  { id: 25, title: "Castro Theatre Classic Film Night", date: "2026-03-24", category: "Theater", cost: "$", location: "Castro", rating: 4.7, link: "https://castrotheatre.com" },
+  { id: 26, title: "Dolores Park Music in the Park", date: "2026-03-25", category: "Music", cost: "Free", location: "Mission", rating: 4.8, link: "https://sf.funcheap.com" },
+  { id: 27, title: "Chinatown Heritage Walk", date: "2026-03-26", category: "Art", cost: "$", location: "Chinatown", rating: 4.6, link: "https://chinatownwalks.com" },
+  { id: 28, title: "SF Food Truck Friday", date: "2026-03-27", category: "Food", cost: "$", location: "SOMA", rating: 4.5, link: "https://sf.funcheap.com" },
+  { id: 29, title: "Marin Headlands Day Hike", date: "2026-03-28", category: "Outdoors", cost: "Free", location: "Marin Headlands", rating: 4.8, link: "https://parksconservancy.org" },
+  { id: 30, title: "Ferry Building Farmers Market", date: "2026-03-29", category: "Food", cost: "Free", location: "Embarcadero", rating: 4.8, link: "https://ferrybuildingmarketplace.com" },
+  { id: 31, title: "Great American Music Hall Showcase", date: "2026-03-28", category: "Music", cost: "$$", location: "Tenderloin", rating: 4.8, link: "https://slimspresents.com" },
+  { id: 32, title: "SF Comedy Competition Finals", date: "2026-03-29", category: "Comedy", cost: "$$", location: "Cobb's Comedy Club", rating: 4.7, link: "https://cobbscomedy.com" },
+  { id: 33, title: "Golden Gate Park Family Picnic", date: "2026-03-29", category: "Family", cost: "Free", location: "Golden Gate Park", rating: 4.6, link: "https://sf.funcheap.com" },
+  { id: 34, title: "End of March Art Walk", date: "2026-03-31", category: "Art", cost: "Free", location: "Dogpatch", rating: 4.5, link: "https://sf.funcheap.com" },
 ];
 
 const INITIAL_RESTAURANTS = [
@@ -230,7 +258,9 @@ const App = () => {
   };
 
   const filteredEvents = useMemo(() => {
-    return events.filter(e => eventCategory === 'All' || e.category === eventCategory);
+    return events
+      .filter(e => eventCategory === 'All' || e.category === eventCategory)
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
   }, [events, eventCategory]);
 
   const filteredFood = useMemo(() => {
