@@ -19,10 +19,19 @@ const NAV_TABS = [
   { id: 'saved', icon: Heart, label: 'Saved' }
 ];
 
+const EVENT_CATEGORIES = ["All", "Music", "Comedy", "Art", "Food", "Festival", "Outdoors", "Sports", "Theater", "Family"];
+
 const INITIAL_EVENTS = [
   { id: 1, title: "Golden Gate Park Bandshell", date: "2026-03-08", category: "Music", cost: "Free", location: "Golden Gate Park", rating: 4.8, link: "https://sf.funcheap.com" },
+  { id: 2, title: "SF Giants Spring Preview", date: "2026-03-15", category: "Sports", cost: "$$", location: "Oracle Park", rating: 4.7, link: "https://sfgiants.com" },
+  { id: 3, title: "Outside Lands Early Bird", date: "2026-03-20", category: "Festival", cost: "$$$", location: "Golden Gate Park", rating: 4.9, link: "https://sfoutsidelands.com" },
   { id: 4, title: "Cobb's Comedy Showcase", date: "2026-03-04", category: "Comedy", cost: "$$", location: "North Beach", rating: 4.5, link: "https://cobbscomedy.com" },
   { id: 5, title: "Chinese New Year Parade", date: "2026-03-07", category: "Art", cost: "Free", location: "Chinatown", rating: 4.9, link: "https://chineseparade.com" },
+  { id: 6, title: "Ferry Building Farmers Market", date: "2026-03-07", category: "Food", cost: "Free", location: "Embarcadero", rating: 4.8, link: "https://ferrybuildingmarketplace.com" },
+  { id: 7, title: "SF Sketchfest Comedy", date: "2026-03-12", category: "Comedy", cost: "$$", location: "Castro Theatre", rating: 4.6, link: "https://sfsketchfest.com" },
+  { id: 8, title: "Lands End Trail Cleanup", date: "2026-03-14", category: "Outdoors", cost: "Free", location: "Lands End", rating: 4.5, link: "https://parksconservancy.org" },
+  { id: 9, title: "SFMOMA After Dark", date: "2026-03-19", category: "Art", cost: "$$", location: "SOMA", rating: 4.7, link: "https://sfmoma.org" },
+  { id: 10, title: "Beach Blanket Babylon", date: "2026-03-21", category: "Theater", cost: "$$$", location: "North Beach", rating: 4.8, link: "https://beachblanketbabylon.com" },
 ];
 
 const INITIAL_RESTAURANTS = [
@@ -179,6 +188,7 @@ const App = () => {
   const [bookmarks, setBookmarks] = useState({ events: [], music: [], food: [] });
   const [foodFilter, setFoodFilter] = useState({ neighborhood: 'All Areas', cuisine: 'All Cuisines' });
   const [musicSearch, setMusicSearch] = useState('');
+  const [eventCategory, setEventCategory] = useState('All');
 
   const syncLiveData = async () => {
     if (!apiKey) {
@@ -218,6 +228,10 @@ const App = () => {
       setLoading(false);
     }
   };
+
+  const filteredEvents = useMemo(() => {
+    return events.filter(e => eventCategory === 'All' || e.category === eventCategory);
+  }, [events, eventCategory]);
 
   const filteredFood = useMemo(() => {
     return restaurants.filter(r => {
@@ -269,6 +283,24 @@ const App = () => {
 
       <main className="p-4 flex-1 pb-32 max-w-2xl mx-auto w-full">
 
+        {/* Explore filters */}
+        {activeTab === 'events' && (
+          <div className="mb-6 animate-in fade-in">
+            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" style={{scrollbarWidth:'none'}}>
+              {EVENT_CATEGORIES.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setEventCategory(cat)}
+                  className={`flex-shrink-0 px-4 py-2 rounded-full text-xs font-black uppercase tracking-tight transition-all border
+                    ${eventCategory === cat ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white text-slate-600 border-slate-200'}`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Food filters */}
         {activeTab === 'food' && (
           <div className="grid grid-cols-2 gap-2 mb-8 animate-in fade-in">
@@ -295,7 +327,7 @@ const App = () => {
 
         <div className="space-y-2">
           {activeTab === 'food' && (filteredFood.length > 0 ? filteredFood.map(f => <Card key={f.id} item={f} type="food" />) : <div className="text-center py-20 text-slate-400">No matches found for this filter.</div>)}
-          {activeTab === 'events' && events.map(e => <Card key={e.id} item={e} type="events" />)}
+          {activeTab === 'events' && (filteredEvents.length > 0 ? filteredEvents.map(e => <Card key={e.id} item={e} type="events" />) : <div className="text-center py-20 text-slate-400">No events in this category.</div>)}
           {activeTab === 'music' && (filteredVenues.length > 0 ? filteredVenues.map(v => <Card key={v.id} item={v} type="music" />) : <div className="text-center py-20 text-slate-400">No venues found.</div>)}
           {activeTab === 'calendar' && <CalendarTab events={events} />}
           {activeTab === 'saved' && (Object.values(bookmarks).flat().length > 0
