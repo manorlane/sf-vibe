@@ -7,8 +7,9 @@ import {
 } from 'lucide-react';
 
 /**
- * SF VIBE - FINAL VERSION
- * Paste your API Key from AI Studio into the quotes below.
+ * SF VIBE - LIVE VERSION
+ * The 'Initial Data' below is just a placeholder. 
+ * Once you add your API Key and hit 'SYNC LIVE', the real data will take over.
  */
 const apiKey = "AIzaSyBfI7qF1zWFWbnmtR1_GRNi3cp3QxnOY3U"; 
 
@@ -23,16 +24,14 @@ const NAV_TABS = [
   { id: 'saved', icon: Heart, label: 'Saved' }
 ];
 
+// Trimmmed down starter data so the app feels more reliant on your Live Sync
 const INITIAL_EVENTS = [
   { id: 1, title: "Golden Gate Park Bandshell", date: "2026-03-08", category: "Music", cost: "Free", location: "Golden Gate Park", rating: 4.8, link: "https://sf.funcheap.com" },
   { id: 4, title: "Cobb's Comedy Showcase", date: "2026-03-04", category: "Comedy", cost: "$$", location: "North Beach", rating: 4.5, link: "https://cobbscomedy.com" },
-  { id: 5, title: "Chinese New Year Parade", date: "2026-03-07", category: "Art", cost: "Free", location: "Chinatown", rating: 4.9, link: "https://chineseparade.com" },
 ];
 
 const INITIAL_RESTAURANTS = [
   { id: 130, name: "Tony's Pizza Napoletana", neighborhood: "North Beach", cuisine: "Italian", rating: 4.8, price: "$$", link: "https://tonyspizzanapoletana.com" },
-  { id: 131, name: "Original Joe's", neighborhood: "North Beach", cuisine: "Italian", rating: 4.6, price: "$$$", link: "https://originaljoes.com" },
-  { id: 111, name: "Sotto Mare", neighborhood: "North Beach", cuisine: "Seafood", rating: 4.7, price: "$$", link: "https://sottomaresf.com" },
   { id: 103, name: "El Techo", neighborhood: "Mission", cuisine: "Mexican", rating: 4.5, price: "$$", link: "https://eltechosf.com" },
 ];
 
@@ -41,6 +40,8 @@ const App = () => {
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
   const [syncError, setSyncError] = useState(null);
+  
+  // These states hold both the initial data AND any new live data fetched
   const [events, setEvents] = useState(INITIAL_EVENTS);
   const [restaurants, setRestaurants] = useState(INITIAL_RESTAURANTS);
   const [bookmarks, setBookmarks] = useState({ events: [], music: [], food: [] });
@@ -48,12 +49,13 @@ const App = () => {
 
   const syncLiveData = async () => {
     if (!apiKey) {
-      setSyncError("Paste your API Key in main.jsx to enable live sync.");
+      setSyncError("Live Sync requires your Gemini API Key. Add it to main.jsx to connect.");
       return;
     }
     setLoading(true);
     setSyncError(null);
     try {
+      // This is the "Connection" to the live web
       const prompt = `Find REAL upcoming events and 4.5+ star restaurants in SF for March 2026. Return JSON: { "events": [], "music": [], "restaurants": [] }.`;
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
         method: 'POST',
@@ -64,12 +66,15 @@ const App = () => {
           generationConfig: { responseMimeType: "application/json" }
         })
       });
+
       const data = await response.json();
       const result = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text || "{}");
+      
+      // We add new results to the TOP of the lists
       if (result.events) setEvents(prev => [...result.events, ...prev]);
       if (result.restaurants) setRestaurants(prev => [...result.restaurants, ...prev]);
     } catch (e) {
-      setSyncError("Live Sync unavailable.");
+      setSyncError("Could not connect to live data. Check your API key.");
     } finally {
       setLoading(false);
     }
@@ -78,8 +83,6 @@ const App = () => {
   const filteredFood = useMemo(() => {
     return restaurants.filter(r => {
       const nameMatch = r.name.toLowerCase().includes(search.toLowerCase());
-      
-      // FIXED: Smart Filtering that matches even if cases or spaces are weird
       const currentHood = foodFilter.neighborhood.toLowerCase().trim();
       const itemHood = r.neighborhood.toLowerCase().trim();
       const currentCuisine = foodFilter.cuisine.toLowerCase().trim();
@@ -95,7 +98,7 @@ const App = () => {
   const Card = ({ item, type }) => {
     const isBookmarked = bookmarks[type]?.includes(item.id);
     return (
-      <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-4 relative">
+      <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-4 relative animate-in fade-in slide-in-from-bottom-2">
         <button onClick={() => setBookmarks(p => ({...p, [type]: isBookmarked ? p[type].filter(i => i !== item.id) : [...p[type], item.id]}))} className={`absolute top-4 right-4 p-2 rounded-full ${isBookmarked ? 'bg-rose-50 text-rose-500' : 'text-slate-300'}`}>
           <Heart className={`h-5 w-5 ${isBookmarked ? 'fill-current' : ''}`} />
         </button>
@@ -115,24 +118,28 @@ const App = () => {
   return (
     <div className="min-h-screen bg-[#FBFBFE] flex flex-col font-sans">
       <header className="bg-white border-b sticky top-0 z-50 px-4 h-16 flex items-center justify-between">
-        <h1 className="font-black italic text-xl tracking-tighter">SF VIBE</h1>
-        <button onClick={syncLiveData} className="bg-slate-900 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2">
+        <h1 className="font-black italic text-xl tracking-tighter text-indigo-600">SF VIBE</h1>
+        <button onClick={syncLiveData} className="bg-slate-900 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-2 active:scale-95 transition-transform">
           <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} /> {loading ? 'SYNCING...' : 'SYNC LIVE'}
         </button>
       </header>
+
+      {syncError && <div className="bg-amber-50 text-amber-700 text-[10px] p-2 text-center font-bold border-b border-amber-100">{syncError}</div>}
+
       <main className="p-4 flex-1 pb-32 max-w-2xl mx-auto w-full">
         {activeTab === 'food' && (
-          <div className="grid grid-cols-2 gap-2 mb-8">
+          <div className="grid grid-cols-2 gap-2 mb-8 animate-in fade-in">
             <select className="bg-white border shadow-sm text-xs font-bold px-4 py-3 rounded-2xl outline-none" value={foodFilter.neighborhood} onChange={(e) => setFoodFilter({...foodFilter, neighborhood: e.target.value})}>{NEIGHBORHOODS.map(n => <option key={n} value={n}>{n}</option>)}</select>
             <select className="bg-white border shadow-sm text-xs font-bold px-4 py-3 rounded-2xl outline-none" value={foodFilter.cuisine} onChange={(e) => setFoodFilter({...foodFilter, cuisine: e.target.value})}>{CUISINES.map(c => <option key={c} value={c}>{c}</option>)}</select>
           </div>
         )}
+
         <div className="space-y-2">
-          {activeTab === 'food' && (filteredFood.length > 0 ? filteredFood.map(f => <Card key={f.id} item={f} type="food" />) : <div className="text-center py-20 text-slate-400 italic">No matches found.</div>)}
+          {activeTab === 'food' && (filteredFood.length > 0 ? filteredFood.map(f => <Card key={f.id} item={f} type="food" />) : <div className="text-center py-20 text-slate-400 italic">No matches. Hit Sync for more!</div>)}
           {activeTab === 'events' && events.map(e => <Card key={e.id} item={e} type="events" />)}
           {activeTab === 'calendar' && (
             <div className="bg-white p-6 rounded-3xl border text-center shadow-sm">
-              <h2 className="font-black mb-6 uppercase tracking-widest text-slate-400 text-xs">March 2026</h2>
+              <h2 className="font-black mb-6 uppercase tracking-widest text-slate-400 text-xs text-indigo-500">March 2026</h2>
               <div className="grid grid-cols-7 gap-1">
                 {['S','M','T','W','T','F','S'].map(d => <div key={d} className="text-[10px] text-slate-300 font-bold">{d}</div>)}
                 {[...Array(31)].map((_, i) => <div key={i} className={`aspect-square flex items-center justify-center font-bold text-sm rounded-xl ${i+1 === 3 ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-700'}`}>{i+1}</div>)}
@@ -147,6 +154,7 @@ const App = () => {
           )}
         </div>
       </main>
+
       <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-1.5 flex gap-1 w-[90%] max-w-md shadow-2xl z-50">
         {NAV_TABS.map((tab) => (
           <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex-1 flex flex-col items-center py-3 rounded-[2.2rem] transition-all ${activeTab === tab.id ? 'bg-white text-indigo-600 shadow-xl' : 'text-slate-200 hover:text-white'}`}>
@@ -161,4 +169,3 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<React.StrictMode><App /></React.StrictMode>);
-
