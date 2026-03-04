@@ -19,7 +19,6 @@ const NAV_TABS = [
   { id: 'saved', icon: Heart, label: 'Saved' }
 ];
 
-
 const INITIAL_EVENTS = [
   { id: 1, title: "Golden Gate Park Bandshell", date: "2026-03-08", category: "Music", cost: "Free", location: "Golden Gate Park", rating: 4.8, link: "https://sf.funcheap.com" },
   { id: 4, title: "Cobb's Comedy Showcase", date: "2026-03-04", category: "Comedy", cost: "$$", location: "North Beach", rating: 4.5, link: "https://cobbscomedy.com" },
@@ -197,7 +196,6 @@ const App = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          tools: [{ "google_search": {} }],
           generationConfig: { responseMimeType: "application/json" }
         })
       });
