@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
 import { 
   Calendar, Music, Palette, Mic2, Trees, Ticket, Utensils, Star, Search, MapPin, 
@@ -217,41 +217,62 @@ const App = () => {
   const [foodFilter, setFoodFilter] = useState({ neighborhood: 'All Areas', cuisine: 'All Cuisines' });
   const [musicSearch, setMusicSearch] = useState('');
   const [eventCategory, setEventCategory] = useState('All');
+  const [restaurantLoading, setRestaurantLoading] = useState(false);
+  const [restaurantSource, setRestaurantSource] = useState('local'); // 'local' or 'yelp'
+
+  const fetchRestaurants = useCallback(async (neighborhood, cuisine) => {
+    setRestaurantLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (neighborhood && neighborhood !== 'All Areas') params.set('neighborhood', neighborhood);
+      if (cuisine && cuisine !== 'All Cuisines') params.set('cuisine', cuisine);
+      const response = await fetch(`/api/restaurants?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
+      if (data.restaurants?.length) {
+        setRestaurants(data.restaurants);
+        setRestaurantSource('yelp');
+      }
+    } catch (err) {
+      console.error('Yelp fetch failed:', err);
+    } finally {
+      setRestaurantLoading(false);
+    }
+  }, []);
+
+  // Fetch from Yelp when Dining tab is first opened
+  useEffect(() => {
+    if (activeTab === 'food' && restaurantSource === 'local') {
+      fetchRestaurants(foodFilter.neighborhood, foodFilter.cuisine);
+    }
+  }, [activeTab]);
+
+  // Re-fetch when filters change (only if already using Yelp)
+  useEffect(() => {
+    if (restaurantSource === 'yelp') {
+      fetchRestaurants(foodFilter.neighborhood, foodFilter.cuisine);
+    }
+  }, [foodFilter]);
 
   const syncLiveData = async () => {
-    if (!apiKey) {
-      alert("No API key found. Add VITE_GEMINI_KEY in Vercel Environment Variables and redeploy.");
-      return;
-    }
     setLoading(true);
     try {
-      const prompt = `Return a JSON object with two arrays: "events" and "restaurants". 
-        Each event should have: id (number), title, date (YYYY-MM-DD format, in March 2026), category, cost (Free or $ or $$ or $$$), location (SF neighborhood), rating (4.0-5.0), link.
-        Each restaurant should have: id (number starting at 300), name, neighborhood (SF neighborhood), cuisine, rating (4.0-5.0), price ($ or $$ or $$$), link.
-        Include 5 real SF events happening in March 2026 and 5 popular SF restaurants. Return ONLY the raw JSON object, no markdown.`;
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: "application/json" }
-        })
-      });
+      const response = await fetch('/api/events');
       if (!response.ok) {
         const err = await response.json();
-        alert(`API error: ${err?.error?.message || response.status}`);
+        alert(`Sync error: ${err?.error || response.status}`);
         return;
       }
       const data = await response.json();
-      const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
-      const clean = raw.replace(/```json|```/g, '').trim();
-      const result = JSON.parse(clean);
-      if (result.events?.length) setEvents(prev => [...result.events, ...prev]);
-      if (result.restaurants?.length) setRestaurants(prev => [...result.restaurants, ...prev]);
-      if (!result.events?.length && !result.restaurants?.length) alert("Sync returned no data. Try again.");
-    } catch (e) {
-      console.error(e);
-      alert(`Sync failed: ${e.message}`);
+      if (data.events?.length) {
+        setEvents(data.events);
+        alert(`Loaded ${data.events.length} live events from SF Fun Cheap & SF Station!`);
+      } else {
+        alert('No events returned. Try again in a moment.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert(`Sync failed: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -356,7 +377,13 @@ const App = () => {
         )}
 
         <div className="space-y-2">
-          {activeTab === 'food' && (filteredFood.length > 0 ? filteredFood.map(f => <Card key={f.id} item={f} type="food" />) : <div className="text-center py-20 text-slate-400">No matches found for this filter.</div>)}
+          {activeTab === 'food' && restaurantLoading && (
+            <div className="text-center py-20 text-slate-400">
+              <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-3 text-indigo-400" />
+              <p className="text-sm font-bold">Loading restaurants from Yelp...</p>
+            </div>
+          )}
+          {activeTab === 'food' && !restaurantLoading && (filteredFood.length > 0 ? filteredFood.map(f => <Card key={f.id} item={f} type="food" />) : <div className="text-center py-20 text-slate-400">No matches found for this filter.</div>)}
           {activeTab === 'events' && (filteredEvents.length > 0 ? filteredEvents.map(e => <Card key={e.id} item={e} type="events" />) : <div className="text-center py-20 text-slate-400">No events in this category.</div>)}
           {activeTab === 'music' && (filteredVenues.length > 0 ? filteredVenues.map(v => <Card key={v.id} item={v} type="music" />) : <div className="text-center py-20 text-slate-400">No venues found.</div>)}
           {activeTab === 'calendar' && <CalendarTab events={events} />}
