@@ -152,8 +152,8 @@ const CalendarTab = ({ events }) => {
       {eventsThisMonth.length > 0 ? eventsThisMonth.map(e => (
         <div key={e.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 mb-3 flex items-center gap-4">
           <div className="bg-indigo-600 text-white rounded-xl w-12 h-12 flex flex-col items-center justify-center flex-shrink-0">
-            <span className="text-[10px] font-black uppercase">{new Date(e.date).toLocaleString('default', { month: 'short' })}</span>
-            <span className="text-lg font-black leading-none">{new Date(e.date).getDate() + 1}</span>
+            <span className="text-[10px] font-black uppercase">{monthName.slice(0,3)}</span>
+            <span className="text-lg font-black leading-none">{parseInt(e.date.split('-')[2])}</span>
           </div>
           <div className="flex-1 min-w-0">
             <h4 className="font-bold text-slate-900 truncate">{e.title}</h4>
@@ -181,7 +181,10 @@ const App = () => {
   const [musicSearch, setMusicSearch] = useState('');
 
   const syncLiveData = async () => {
-    if (!apiKey) return;
+    if (!apiKey) {
+      alert("No API key found. Add VITE_GEMINI_KEY in Vercel Environment Variables and redeploy.");
+      return;
+    }
     setLoading(true);
     try {
       const prompt = `Find SF events and restaurants for March 2026. Return as JSON.`;
