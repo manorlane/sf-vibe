@@ -187,17 +187,37 @@ const App = () => {
     }
     setLoading(true);
     try {
-      const prompt = `Find SF events and restaurants for March 2026. Return as JSON.`;
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+      const prompt = `Return a JSON object with two arrays: "events" and "restaurants". 
+        Each event should have: id (number), title, date (YYYY-MM-DD format, in March 2026), category, cost (Free or $ or $$ or $$$), location (SF neighborhood), rating (4.0-5.0), link.
+        Each restaurant should have: id (number starting at 300), name, neighborhood (SF neighborhood), cuisine, rating (4.0-5.0), price ($ or $$ or $$$), link.
+        Include 5 real SF events happening in March 2026 and 5 popular SF restaurants. Return ONLY the raw JSON object, no markdown.`;
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], tools: [{ "google_search": {} }], generationConfig: { responseMimeType: "application/json" } })
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          tools: [{ "google_search": {} }],
+          generationConfig: { responseMimeType: "application/json" }
+        })
       });
+      if (!response.ok) {
+        const err = await response.json();
+        alert(`API error: ${err?.error?.message || response.status}`);
+        return;
+      }
       const data = await response.json();
-      const result = JSON.parse(data.candidates?.[0]?.content?.parts?.[0]?.text || "{}");
-      if (result.events) setEvents(prev => [...result.events, ...prev]);
-      if (result.restaurants) setRestaurants(prev => [...result.restaurants, ...prev]);
-    } catch (e) { console.error(e); } finally { setLoading(false); }
+      const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const result = JSON.parse(clean);
+      if (result.events?.length) setEvents(prev => [...result.events, ...prev]);
+      if (result.restaurants?.length) setRestaurants(prev => [...result.restaurants, ...prev]);
+      if (!result.events?.length && !result.restaurants?.length) alert("Sync returned no data. Try again.");
+    } catch (e) {
+      console.error(e);
+      alert(`Sync failed: ${e.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredFood = useMemo(() => {
@@ -228,7 +248,7 @@ const App = () => {
         <button onClick={() => setBookmarks(p => ({...p, [type]: isBookmarked ? p[type].filter(i => i !== item.id) : [...p[type], item.id]}))} className={`absolute top-4 right-4 p-2 rounded-full ${isBookmarked ? 'bg-rose-50 text-rose-500' : 'text-slate-300'}`}>
           <Heart className={`h-5 w-5 ${isBookmarked ? 'fill-current' : ''}`} />
         </button>
-        <span className="bg-indigo-50 text-indigo-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase mb-2 inline-block">{item.cuisine || item.genre || "SF Vibe"}</span>
+        <span className="bg-indigo-50 text-indigo-600 text-[10px] font-black px-2 py-0.5 rounded-full uppercase mb-2 inline-block">{item.category || item.cuisine || item.genre || "SF Vibe"}</span>
         <h3 className="text-xl font-bold text-slate-900 leading-tight">{item.name || item.title}</h3>
         <p className="text-sm text-slate-500 mb-4">{item.rating} <Star className="inline h-3 w-3 fill-current text-amber-500" /> • {item.neighborhood || item.location}</p>
         <div className="flex justify-between items-center pt-4 border-t border-slate-50">
