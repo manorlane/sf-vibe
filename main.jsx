@@ -10,7 +10,7 @@ import {
  * SF VIBE - FINAL VERSION
  * Paste your API Key from AI Studio into the quotes below.
  */
-const apiKey = ""; 
+const apiKey = "AIzaSyBfI7qF1zWFWbnmtR1_GRNi3cp3QxnOY3U"; 
 
 const NEIGHBORHOODS = ["All Areas", "Mission", "Chinatown", "North Beach", "Hayes Valley", "SOMA", "Richmond", "Sunset", "Marina", "Castro", "Fillmore", "Dogpatch", "Nob Hill", "Bernal Heights", "Potrero Hill", "Haight-Ashbury", "Embarcadero", "Presidio"];
 const CUISINES = ["All Cuisines", "Italian", "Chinese", "Thai", "Mexican", "American", "Seafood", "Japanese", "French", "Vegetarian", "Bakery", "Korean", "Steakhouse", "Indian", "Greek", "Brunch", "Mediterranean"];
@@ -161,3 +161,4 @@ const App = () => {
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<React.StrictMode><App /></React.StrictMode>);
+
